@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+smb_intelligence_real_world_sweden.xlsx
+app_vanna.py
+sample prompts.rtf
