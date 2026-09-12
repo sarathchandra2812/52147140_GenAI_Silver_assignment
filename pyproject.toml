@@ -1,0 +1,33 @@
+[project]
+name = "local-bi-mcp-platform"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Sarath",email = "133102324+sarathchandraasapu@users.noreply.github.com"}
+]
+requires-python = ">=3.11,<4.0"
+dependencies = [
+    "mcp (>=1.28,<2)",
+    "streamlit (>=1.61.1,<2.0.0)",
+    "pandas (>=3.0.5,<4.0.0)",
+    "plotly (>=6.9.0,<7.0.0)",
+    "faker (>=40.36.0,<41.0.0)",
+    "langchain (>=1.3.14,<2.0.0)",
+    "langchain-ollama (>=1.1.0,<2.0.0)",
+    "textblob (>=0.20.1,<0.21.0)",
+    "watchdog (>=6.0.0,<7.0.0)",
+    "tabulate (>=0.10.0,<0.11.0)",
+    "openpyxl (>=3.1.5,<4.0.0)",
+    "langchain-openai (>=1.6.1,<2.0.0)",
+    "langchain-google-genai (>=4.4.0,<5.0.0)",
+]
+
+[tool.poetry]
+package-mode = false
+
+[tool.ruff]
+target-version = "py311"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
