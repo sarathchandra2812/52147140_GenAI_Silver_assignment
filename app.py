@@ -32,7 +32,6 @@ DB_PATH = BASE_DIR / "sweden_data.db"
 MODEL_NAME = "gemini-3.1-flash-lite"
 QUERY_ERROR_PREFIX = "QUERY_ERROR:"
 SCHEMA_ERROR_PREFIX = "SCHEMA_ERROR:"
-REPORT_ERROR_PREFIX = "REPORT_ERROR:"
 MAX_INSIGHT_ROWS = 100
 CAPABILITIES_MESSAGE = "I'm a Business Intelligence assistant for this store's data. Ask me about sales and revenue, " "inventory or restocking needs, customer ratings and sentiment, or competitor pricing \u2014 " "or use the Weekly/Monthly report buttons in the sidebar."
 
@@ -151,70 +150,70 @@ def _normalize_sql(model_output: str) -> str:
     return output
 
 
-def _build_chart(dataframe: pd.DataFrame) -> Any | None:
-    """Create a simple Plotly chart from the query result without executing model-generated code."""
-    if dataframe.empty or len(dataframe.columns) < 2:
-        return None
+# def _build_chart(dataframe: pd.DataFrame) -> Any | None:
+#     """Create a simple Plotly chart from the query result without executing model-generated code."""
+#     if dataframe.empty or len(dataframe.columns) < 2:
+#         return None
 
-    columns = set(dataframe.columns)
+#     columns = set(dataframe.columns)
 
-    # Time-series result
-    date_columns = [column for column in dataframe.columns if "date" in column.lower()]
+#     # Time-series result
+#     date_columns = [column for column in dataframe.columns if "date" in column.lower()]
 
-    numeric_columns = dataframe.select_dtypes(include="number").columns.tolist()
+#     numeric_columns = dataframe.select_dtypes(include="number").columns.tolist()
 
-    if date_columns and numeric_columns:
-        x_column = date_columns[0]
-        y_column = numeric_columns[0]
+#     if date_columns and numeric_columns:
+#         x_column = date_columns[0]
+#         y_column = numeric_columns[0]
 
-        chart_df = dataframe.copy()
-        chart_df[x_column] = pd.to_datetime(
-            chart_df[x_column],
-            errors="coerce",
-        )
-        chart_df = chart_df.dropna(subset=[x_column])
+#         chart_df = dataframe.copy()
+#         chart_df[x_column] = pd.to_datetime(
+#             chart_df[x_column],
+#             errors="coerce",
+#         )
+#         chart_df = chart_df.dropna(subset=[x_column])
 
-        if not chart_df.empty:
-            return px.line(
-                chart_df,
-                x=x_column,
-                y=y_column,
-                title=f"{y_column} over time",
-            )
+#         if not chart_df.empty:
+#             return px.line(
+#                 chart_df,
+#                 x=x_column,
+#                 y=y_column,
+#                 title=f"{y_column} over time",
+#             )
 
-    # Categorical + numeric result
-    categorical_columns = dataframe.select_dtypes(exclude="number").columns.tolist()
+#     # Categorical + numeric result
+#     categorical_columns = dataframe.select_dtypes(exclude="number").columns.tolist()
 
-    if categorical_columns and numeric_columns:
-        x_column = categorical_columns[0]
-        y_column = numeric_columns[0]
+#     if categorical_columns and numeric_columns:
+#         x_column = categorical_columns[0]
+#         y_column = numeric_columns[0]
 
-        chart_df = dataframe.copy()
+#         chart_df = dataframe.copy()
 
-        # Prevent unreadable charts with very large categorical results.
-        if len(chart_df) > 20:
-            chart_df = chart_df.nlargest(
-                20,
-                y_column,
-            )
+#         # Prevent unreadable charts with very large categorical results.
+#         if len(chart_df) > 20:
+#             chart_df = chart_df.nlargest(
+#                 20,
+#                 y_column,
+#             )
 
-        return px.bar(
-            chart_df,
-            x=x_column,
-            y=y_column,
-            title=f"{y_column} by {x_column}",
-        )
+#         return px.bar(
+#             chart_df,
+#             x=x_column,
+#             y=y_column,
+#             title=f"{y_column} by {x_column}",
+#         )
 
-    # Two numeric columns
-    if len(numeric_columns) >= 2:
-        return px.scatter(
-            dataframe,
-            x=numeric_columns[0],
-            y=numeric_columns[1],
-            title=f"{numeric_columns[1]} vs {numeric_columns[0]}",
-        )
+#     # Two numeric columns
+#     if len(numeric_columns) >= 2:
+#         return px.scatter(
+#             dataframe,
+#             x=numeric_columns[0],
+#             y=numeric_columns[1],
+#             title=f"{numeric_columns[1]} vs {numeric_columns[0]}",
+#         )
 
-    return None
+#     return None
 
 
 def _prepare_dataframe_for_insight(
@@ -293,7 +292,7 @@ async def _get_latest_data_date(session: ClientSession) -> str:
 async def _generate_capabilities_response(
     user_prompt: str,
     schema: str,
-    llm: ChatOllama,
+    llm: ChatGoogleGenerativeAI,
 ) -> str:
     """Generate a concise, schema-aware response for non-data questions."""
     prompt = f"""You are a friendly Business Intelligence assistant.
@@ -373,7 +372,7 @@ def _is_non_bi_message(user_prompt: str) -> bool:
 
 async def run_bi_agent(
     user_prompt: str,
-    llm: ChatOllama,
+    llm: ChatGoogleGenerativeAI,
     cached_schema: str | None,
 ) -> tuple[pd.DataFrame, str, str, Any | None, str]:
     """Run schema retrieval, Text-to-SQL, execution, and insight generation over MCP stdio."""
@@ -387,7 +386,7 @@ async def run_bi_agent(
 
 async def _run_bi_agent(
     user_prompt: str,
-    llm: ChatOllama,
+    llm: ChatGoogleGenerativeAI,
     cached_schema: str | None,
 ) -> tuple[pd.DataFrame, str, str, Any | None, str]:
 
@@ -667,7 +666,7 @@ async def _run_bi_agent(
 class _BackgroundLoop:
     """Owns one event loop for the app's lifetime.
 
-    ChatOllama lazily binds its internal async HTTP client to whichever loop is
+    ChatGoogleGenerativeAI lazily binds its internal async HTTP client to whichever loop is
     running on first use. Since get_llm() is cached across Streamlit reruns,
     spinning up a fresh asyncio.run() loop per request left that client bound
     to a loop that had already been closed, raising "Event loop is closed" on
@@ -812,7 +811,7 @@ def main() -> None:
                     "plot_fig": plot_fig,
                 }
             )
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             error_message = f"I could not complete that request: {exc or type(exc).__name__}"
             logger.error("Chat request failed for prompt %r: %s", prompt, exc or type(exc).__name__)
             st.error(error_message)
