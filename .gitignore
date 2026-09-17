@@ -219,3 +219,4 @@ __marimo__/
 smb_intelligence_real_world_sweden.xlsx
 app_vanna.py
 sample prompts.rtf
+*.DS_Store
