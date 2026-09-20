@@ -523,7 +523,17 @@ def create_bi_graph() -> StateGraph:
     workflow.add_edge("plotting", "finalize_response")
 
     graph = workflow.compile(
-        # checkpointer=MemorySaver(serde=JsonPlusSerializer(pickle_fallback=True))
+        checkpointer=MemorySaver(serde=JsonPlusSerializer(pickle_fallback=True))
     )
     logger.info("LangGraph workflow compiled successfully")
+
+    # try:
+    #     from pathlib import Path
+    #     image_path = Path(__file__).resolve().parent / "langgraph_workflow.png"
+    #     image_bytes = graph.get_graph().draw_mermaid_png()
+    #     image_path.write_bytes(image_bytes)
+    #     logger.info("Saved workflow image to %s", image_path)
+    # except Exception as exc:  # pragma: no cover - best effort image export
+    #     logger.warning("Could not save workflow image: %s", exc)
+
     return graph

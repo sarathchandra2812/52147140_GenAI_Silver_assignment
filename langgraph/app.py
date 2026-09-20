@@ -20,6 +20,30 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve()
 DB_PATH = BASE_DIR / "sweden_data.db"
 
+PROMPT_GROUPS = {
+    "Easy": [
+        "What was our total revenue last month?",
+        "Which products are currently low on stock based on their reorder levels?",
+        "What is the average customer rating across all our products?",
+        "How many total units of inventory do we currently have across all retailers?",
+        "List all competitors who have priced our products below 500 SEK.",
+    ],
+    "Medium": [
+        "Show me a trend of daily revenue over the last 30 days.",
+        "What are our top 5 best-selling product categories by total units sold?",
+        "Generate a monthly business performance report.",
+        "Which retailer generated the highest total revenue last quarter?",
+        "Show me the average competitor price for each product category.",
+    ],
+    "Complex": [
+        "Which specific products drove the highest total revenue last month but are currently flagged as low on stock?",
+        "Is there a correlation between the average customer rating and the total units sold for each product over the last 90 days?",
+        "Are there any products with an average customer rating below 3.0 where our average selling price is higher than the average competitor price?",
+        "Why did our total revenue drop this week compared to last week? Break down the performance differences by product category.",
+        "How does our daily total revenue compare to the average daily competitor price changes for our top 3 best-selling products over the last month?",
+    ],
+}
+
 st.set_page_config(page_title="Local BI Assistant", page_icon="📊", layout="wide")
 
 
@@ -108,17 +132,17 @@ def main() -> None:
             logger.info("Started new conversation thread_id=%s", st.session_state.thread_id)
             st.rerun()
         st.markdown("---")
-        st.subheader("Try one of these")
-        for prompt in [
-            "What was total revenue last month?",
-            "Why did sales drop last month?",
-            "Which products are running low on stock?",
-            "Prepare a monthly business report with key actions.",
-            "What are the latest customer sentiment trends?",
-            "Compare competitor pricing for the top products.",
-        ]:
-            if st.button(prompt, key=f"sample_{prompt}"):
-                st.session_state.pending_prompt = prompt
+        st.subheader("Prompt library")
+        st.caption("Choose a prompt to run it in the chat.")
+        for difficulty, prompts in PROMPT_GROUPS.items():
+            with st.expander(f"{difficulty} prompts", expanded=difficulty == "Easy"):
+                for index, prompt_text in enumerate(prompts):
+                    if st.button(
+                        prompt_text,
+                        key=f"sample_{difficulty.lower()}_{index}",
+                        width="stretch",
+                    ):
+                        st.session_state.pending_prompt = prompt_text
 
     for message in st.session_state.history:
         _render_message(message)

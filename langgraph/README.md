@@ -7,11 +7,13 @@ This project is designed for local experimentation, internal BI workflows, and l
 ## Why this project exists
 
 Most BI tools require either:
+
 - a complex enterprise stack,
 - a managed cloud warehouse,
 - or a heavy dashboard platform.
 
 This project keeps the workflow lightweight:
+
 - local SQLite data source,
 - LangGraph orchestration,
 - safe read-only SQL generation,
@@ -20,6 +22,7 @@ This project keeps the workflow lightweight:
 - business-friendly summaries and charts.
 
 It is especially useful for:
+
 - small teams working from local data,
 - prototypes and demos,
 - privacy-conscious analytics,
@@ -84,7 +87,7 @@ local_bi_langgraph/
 The project expects the local SQLite database to be available in the sibling project folder, typically:
 
 ```text
-../local_bi_analyst/sweden_data.db
+./sweden_data.db
 ```
 
 ---
@@ -175,6 +178,7 @@ The workflow is optimized for business questions such as:
 - Compare competitor pricing for top products.
 
 The app routes based on intent:
+
 - general
 - business
 - diagnostic
@@ -198,6 +202,7 @@ This project is intentionally designed with strict data safety controls.
 ### Why this matters
 
 This prevents:
+
 - destructive DB operations,
 - broad unbounded queries,
 - accidental schema changes,
@@ -222,6 +227,7 @@ This app is designed to work with a local SQLite retail dataset. It reads schema
 - business trend analysis
 
 The workflow is tuned for retail-analysis use cases and expects business semantics such as:
+
 - revenue in SEK
 - low stock based on reorder thresholds
 - recent dates and trend comparisons
@@ -234,11 +240,13 @@ The workflow is tuned for retail-analysis use cases and expects business semanti
 The UI stores conversation history in the Streamlit session state and includes a thread identifier for near-term request continuity.
 
 Current behavior:
+
 - user-specific history is kept within the local browser session,
 - new conversation resets the thread and clears chat history,
 - the app is designed for local, session-scoped continuity rather than remote durable memory.
 
 This is suitable for local prototype and internal tool use. If you want production-scale conversation persistence, the next step would be:
+
 - a persistent database-backed memory layer,
 - durable checkpoints,
 - user authentication,
@@ -361,12 +369,14 @@ This project currently does not declare a license in the repository metadata. If
 The Local Business Intelligence Assistant is a practical, low-friction, local-first BI experience built on LangGraph, Streamlit, SQLite, and Gemini. It demonstrates how an LLM can safely translate natural-language business questions into validated read-only SQL, analyze results, and present the outcome in a business-friendly format.
 
 It is best suited for:
+
 - local analytics workflows,
 - prototyping and demos,
 - internal business intelligence usage,
 - privacy-conscious analysis with no heavy cloud dependency.
 
 If you want, I can also turn this into:
+
 - a more executive-style GitHub README,
 - a more technical engineering README,
 - or a one-page product pitch README with screenshots and feature callouts.
